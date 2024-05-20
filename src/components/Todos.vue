@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import '@/assets/main.css';
-import { onMounted, ref } from 'vue';
-import type { Schema } from '../../amplify/data/resource';
-import { generateClient } from 'aws-amplify/data';
+import {onMounted, ref} from 'vue';
+import type {Schema} from '../../amplify/data/resource';
+import {generateClient} from 'aws-amplify/data';
 
 const client = generateClient<Schema>();
 
@@ -11,7 +11,7 @@ const todos = ref<Array<Schema['Todo']["type"]>>([]);
 
 function listTodos() {
   client.models.Todo.observeQuery().subscribe({
-    next: ({ items, isSynced }) => {
+      next: ({items}) => {
       todos.value = items
      },
   }); 
@@ -24,6 +24,11 @@ function createTodo() {
     // After creating a new todo, update the list of todos
     listTodos();
   });
+}
+
+
+function deleteTodo(id: string) {
+    client.models.Todo.delete({id})
 }
     
 // fetch todos when the component is mounted
@@ -38,8 +43,9 @@ function createTodo() {
     <h1>My todos</h1>
     <button @click="createTodo">+ new</button>
     <ul>
-      <li 
-        v-for="todo in todos" 
+        <li
+            v-for="todo in todos"
+            @click="deleteTodo(todo.id)"
         :key="todo.id">
         {{ todo.content }}
       </li>
